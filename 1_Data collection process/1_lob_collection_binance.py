@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 binance = ccxt.binance()  
 
 # Initialize the SQLite database
-engine = create_engine('sqlite:////crypto_data.db')
+engine = create_engine('sqlite:///crypto_data.db')
 Base = declarative_base()
 
 # Define the OrderBook table
