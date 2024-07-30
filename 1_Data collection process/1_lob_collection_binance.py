@@ -39,13 +39,13 @@ session = Session()
 
 # Function to fetch the limit order book
 def fetch_order_book(symbol):
-    order_book = binance.fetch_order_book(symbol)[-1]
+    order_book = binance.fetch_order_book(symbol)
     return order_book
 
 # Function to fetch OHLCV data
 def fetch_ohlcv(symbol, timeframe='1m'):
-    ohlcv = binance.fetch_ohlcv(symbol, timeframe)[-1]
-    df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+    ohlcv = binance.fetch_ohlcv(symbol, timeframe)
+    df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume']).iloc[[-1]]
     df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms').astype(str)
     return df
 
