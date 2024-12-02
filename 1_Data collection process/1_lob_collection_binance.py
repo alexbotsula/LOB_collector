@@ -1,15 +1,21 @@
 import ccxt
 import pandas as pd
 import time
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, JSON
+from sqlalchemy import create_engine, Column, Integer, String, Float, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
 
-# Initialize the Binance exchange
-binance = ccxt.binance()  
+# PostgreSQL Database Configuration
+DB_HOST = "localhost"
+DB_NAME = "crypto_data"
+DB_USER = "lob_user"
+DB_PORT = "5432"  # Default PostgreSQL port
 
-# Initialize the SQLite database
-engine = create_engine('sqlite:///crypto_data.db')
+DB_PASSWORD = os.getenv("DB_PASSWORD", "default_password")
+
+# Initialize the database engine
+engine = create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 Base = declarative_base()
 
 # Define the OrderBook table
@@ -33,9 +39,15 @@ class OHLCV(Base):
     close = Column(Float)
     volume = Column(Float)
 
+# Create all tables in the PostgreSQL database
 Base.metadata.create_all(engine)
+
+# Initialize the session
 Session = sessionmaker(bind=engine)
 session = Session()
+
+# Initialize the Binance exchange
+binance = ccxt.binance()
 
 # Function to fetch the limit order book
 def fetch_order_book(symbol):
@@ -49,7 +61,7 @@ def fetch_ohlcv(symbol, timeframe='1m'):
     df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms').astype(str)
     return df
 
-# Function to store data in SQLite
+# Function to store data in PostgreSQL
 def store_data(symbol, order_book, ohlcv_df):
     # Order Book Data
     order_book_data = OrderBook(
@@ -92,7 +104,7 @@ while True:
             print(f"\nOHLCV Data for {symbol}:")
             print(ohlcv_df.tail())  # Print the last few entries
 
-            # Store data in SQLite
+            # Store data in PostgreSQL
             store_data(symbol, order_book, ohlcv_df)
 
         except Exception as e:
