@@ -15,7 +15,7 @@ DB_PORT = "5432"  # Default PostgreSQL port
 DB_PASSWORD = os.getenv("DB_PASSWORD", "default_password")
 
 # Initialize the database engine
-engine = create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
+engine = create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}', pool_pre_ping=True)
 Base = declarative_base()
 
 # Define the OrderBook table
